@@ -1,6 +1,5 @@
 "use strict";
 
-const ky = require("ky-universal");
 const isUUID = require("is-uuid");
 
 class HypixelError extends Error {
@@ -15,10 +14,16 @@ module.exports = async (endpoint, options = {}) => {
 		throw new TypeError("`options.key` must be set to an API key!");
 	}
 
-	const request = await ky(endpoint, {
-		prefixUrl: "https://api.hypixel.net",
-		searchParams: options,
+	let url = `https://api.hypixel.net/${endpoint}`;
+	Object.keys(options).forEach(key => {
+		if (key == "key") {
+			url += `&key=${encodeURIComponent(options[key])}`;
+		} else {
+			url += `?${key}=${encodeURIComponent(options[key])}`;
+		}
 	});
+	const request = await fetch(url);
+
 	const data = await request.json();
 
 	if (!data.success) {
@@ -26,7 +31,6 @@ module.exports = async (endpoint, options = {}) => {
 	}
 
 	return data;
-	// return Object.values(data)[1]
 };
 
 module.exports.HypixelError = HypixelError;
