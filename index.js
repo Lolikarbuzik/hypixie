@@ -15,14 +15,15 @@ module.exports = async (endpoint, options = {}) => {
 	}
 
 	let url = `https://api.hypixel.net/${endpoint}`;
-	Object.keys(options).forEach(key => {
-		if (key == "key") {
-			url += `&key=${encodeURIComponent(options[key])}`;
-		} else {
-			url += `?${key}=${encodeURIComponent(options[key])}`;
-		}
+	Object.keys(options).forEach((key) => {
+		if (key == "key") return;
+		url += `?${key}=${encodeURIComponent(options[key])}`;
 	});
-	const request = await fetch(url);
+	const request = await fetch(url, {
+		headers: {
+			"API-KEY": options.key,
+		},
+	});
 
 	const data = await request.json();
 
